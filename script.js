@@ -40,7 +40,7 @@ class Player {
     strike(player, enemy, attackDmg) {
         let damageAmount = Math.ceil(Math.random() * attackDmg);
         enemy.health -= damageAmount;
-        gameUpdate(player,enemy,game.isOver);
+        gameUpdate(p1,p2,game.isOver);
         return `${player.name} attacks ${enemy.name} for ${damageAmount} damage!`;
     }
 
@@ -51,7 +51,7 @@ class Player {
 
         let hpAmount = Math.ceil(Math.random() * 5);
         player.health += hpAmount;
-        gameeUpdate(p1,p2,game.isOver);
+        gameUpdate(p1,p2,game.isOver);
         return `${player.name} heals for ${hpAmount} HP!`;
     }
 
@@ -66,11 +66,13 @@ class Game {
         //if the game is over and a player has 0 health declare the winner
     
         //Create a message variable that will display the message based on the condition
-        // let message;
+        let message = "TIE!";
 
         if(isOver == true && p1.health <= 0) {
             message = `${p2.name} WINS!`;
-        }else if(isOver == true && p2.health <= 0) {
+        }
+        
+        else if(isOver == true && p2.health <= 0) {
             message = `${p1.name} WINS!`;
         }
 
@@ -80,9 +82,25 @@ class Game {
 
     reset(p1,p2) {
 
+        p1.health = 100;
+        p2.health =100;
+        this.isOver = false;
+        resultDiv.innerText = '';
+        gameUpdate(p1,p2,game.isOver);
+
     }
 
     play(p1,p2) {
+        this.reset(p1,p2);
+
+        while(!this.isOver) {
+            p1.strike(p1,p2,p1.attackDmg)
+            p2.heal(p2)
+            p2.strike(p2,p1,p2.attackDmg)
+            p1.heal(p1)
+        }
+
+        return this.declareWinner(p1,p2,this.isOver)
 
     }
 }
@@ -101,10 +119,38 @@ let game = new Game()
 gameUpdate(p1,p2,game.isOver)
 
 let gameState;
-// player1 controls
 
+playButton.onclick = () => result.innerText = game.play(p1,p2)
+
+
+// player1 controls
 document.addEventListener('keydown', function(e) {
     if(e.key == 'q' && p2.health > 0 && game.isOver == false) {
         p1.strike(p1,p2,p1.attackDmg);
+        document.getElementById('p1attack').play();
+    }
+}); 
+
+//player1 heals
+document.addEventListener('keydown', function(e) {
+    if(e.key == 'a' && p2.health > 0) {
+        p1.heal(p1);
+        document.getElementById('p1heal').play();
+    }
+}); 
+
+//player2 attack
+document.addEventListener('keydown', function(e) {
+    if(e.key == 'p' && p1.health > 0 && game.isOver == false) {
+        p2.strike(p2,p1,p2.attackDmg);
+        document.getElementById('p2attack').play();
+    }
+}); 
+
+//player2 heals
+document.addEventListener('keydown', function(e) {
+    if(e.key == 'l' && p1.health > 0) {
+        p2.heal(p2);
+        document.getElementById('p2heal').play();
     }
 }); 
